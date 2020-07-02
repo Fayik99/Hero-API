@@ -1,8 +1,14 @@
-var express = require('express');
+const express = require('express');
+const authenticator = require('./middlewares/authenticator');
+const sendEmail = require('./middlewares/sendEmail');
 const app = express();
 const PORT = 5000;
 
 app.use(express.json());
+
+
+app.use(authenticator);
+app.use(sendEmail);
 
 let heroesArray = [{
     id: 1,
