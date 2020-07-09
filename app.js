@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const heroes = require('./routes/heroes');
 const home = require('./routes/home');
 const authenticator = require('./middlewares/authenticator');
@@ -11,6 +12,11 @@ app.use(authenticator);
 app.use(sendEmail);
 app.use('/api/heroes', heroes);
 app.use('/', home);
+
+mongoose
+.connect("mongodb://localhost/herodb", {useNewUrlParser: true,  useUnifiedTopology: true})
+.then(() => console.log("Connected to DB successfully"))
+.catch(err => console.log("Error has occured while connecting to DB : ", err));
 
 
 app.listen(PORT, function(){
