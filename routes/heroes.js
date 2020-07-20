@@ -2,18 +2,6 @@ const express = require('express');
 const Hero = require('../models/hero');
 const router = express.Router();
 
-let heroesArray = [{
-    id: 1,
-    name: 'Captain America'
-}, {
-    id: 2,
-    name: 'Iron Man' 
-}, {
-    id: 3,
-    name: 'Black Window'
-
-}];
-
 
 router.get('/', async (req,res) =>{
     //res.send(heroesArray);
@@ -60,30 +48,45 @@ router.post('/', async (req,res) => {
 });
 
 router.put('/:heroId', async (req,res) => {
-    let hero = await Hero.findById(req.params.heroId);
+    // let hero = await Hero.findById(req.params.heroId);
 
-    if (!hero){
-        return res.status(404).send("Given Id does not exist on our server");
-      }
+    // if (!hero){
+    //     return res.status(404).send("Given Id does not exist on our server");
+    //   }
     
-    if (!req.body.heroName) {
-        return res.status(400).send("Not all mandatory values have been set!");
-      }
-      hero.set({name : req.body.heroName})
-      hero = await hero.save();
-      res.send(hero);
+    // if (!req.body.heroName) {
+    //     return res.status(400).send("Not all mandatory values have been set!");
+    //   }
+    //   hero.set({name : req.body.heroName})
+    //   hero = await hero.save();
+    //   res.send(hero);
+
+    //  method 2
+    let hero = await Hero.findByIdAndUpdate(
+        {_id: req.params.heroId },
+        { $set: { likeCount: req.body.likeCount}},
+        {new: true, useFindAndModify: false}
+    );
+    res.send(hero);
 });
 
 router.delete('/:heroId', async (req,res) => {
   
-    let hero = Hero.findById(req.params.heroId)
+    // let hero = Hero.findById(req.params.heroId)
 
-    if (!hero){
-        return res.status(404).send("Given Id does not exist on our server");
-      }
+    // if (!hero){
+    //     return res.status(404).send("Given Id does not exist on our server");
+    //   }
     
-     let result = await Hero.remove(hero);  // deleteOne, deleteMany recommended
-     res.send(result);
+    //  let result = await Hero.remove(hero);  // deleteOne, deleteMany recommended
+    //  res.send(result);
+
+     //method 2 
+     let hero = await Hero.findByIdAndDelete({ _id: req.params.heroId});
+     if (!hero){
+        return res.status(404).send("Given Id does not exist on our server");
+        }
+     res.send(hero);   
 }); 
 
 module.exports = router;
