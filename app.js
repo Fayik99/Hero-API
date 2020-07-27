@@ -1,12 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const heroes = require('./routes/heroes');
+const cors = require('cors');
 const home = require('./routes/home');
 const authenticator = require('./middlewares/authenticator');
 const sendEmail = require('./middlewares/sendEmail');
 const app = express();
 const PORT = 5000;
 
+app.use(cors());
 app.use(express.json());
 app.use(authenticator);
 app.use(sendEmail);
