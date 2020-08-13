@@ -1,6 +1,9 @@
 const express = require('express');
 const Hero = require('../models/hero');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
+
+const SECRET_KEY = "123456789"
 
 
 router.get('/', async (req,res) =>{
@@ -28,9 +31,21 @@ router.get('/:heroId', async(req,res) =>{
 
 router.post('/', async (req,res) => {
  
+     const token = req.header("x-jwt-token");
+
+     if(!token) return res.status(401).send("Access denied. No token");
+
+
+    try { 
+        jwt.verify(token, SECRET_KEY);
+    } catch (e) {
+        return res.status(400).send("Invalid token");
+    }
+   
+
    if(!req.body.heroName) {
-    return res.status(400).send("Not all mandatory values have been set!");
-   } 
+    return res.status(400).send("Not all mandatory values have been set!"); }
+
    try{
     let heroToBeAddedToDb = new Hero({
         name: req.body.heroName,
@@ -82,6 +97,22 @@ router.delete('/:heroId', async (req,res) => {
     //  res.send(result);
 
      //method 2 
+
+     
+     const token = req.header("x-jwt-token");
+
+    if(!token) return res.status(401).send("Access denied. No token");
+
+    try { 
+        jwt.verify(token, SECRET_KEY);
+    } catch (e) {
+        return res.status(400).send("Invalid token");
+    }
+
+    let decoded = jwt.decode(token, SECRET_KEY);
+    if(!decoded.isAdmin)
+      return res.status(403).send("Forbidden- You have no authorization to delete");
+
      let hero = await Hero.findByIdAndDelete({ _id: req.params.heroId});
      if (!hero){
         return res.status(404).send("Given Id does not exist on our server");
